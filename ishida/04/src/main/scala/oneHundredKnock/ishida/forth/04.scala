@@ -38,7 +38,9 @@ object Main {
     val node = tagger.parseToNode(text)
 
     val mecab = mecabNodeListMapper(node.toList)
-    extractVerbBase(mecab) foreach println
+    //extractVerbBase(mecab) foreach println
+    //extractSuddenConnection(mecab) foreach println
+    extractNounPhrase(mecab) foreach println
   }
 
   def mecabNodeListMapper(nodeLst: List[Node]): List[Map[String, String]] = {
@@ -60,6 +62,16 @@ object Main {
 
   def extractVerbBase(mecab: List[Map[String, String]]): List[String] = {
     mecab collect { case morpheme if morpheme("pos") == "動詞" => morpheme("base") } toList
+  }
+
+  def extractSuddenConnection(mecab: List[Map[String, String]]): List[String] = {
+    mecab collect { case morpheme if morpheme("pos1") == "サ変接続" => morpheme("base") } toList
+  }
+
+  def extractNounPhrase(mecab: List[Map[String, String]]): List[String] = {
+    mecab.sliding(3) collect {
+      case List(a, and, b) if and("surface") == "の" && a("pos") == "名詞" && b("pos") == "名詞" => a("surface") + and("surface") + b("surface")
+    } toList
   }
 
 }
