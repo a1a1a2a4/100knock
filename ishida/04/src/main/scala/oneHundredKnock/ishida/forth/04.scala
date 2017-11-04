@@ -40,7 +40,8 @@ object Main {
     val mecab = mecabNodeListMapper(node.toList)
     //extractVerbBase(mecab) foreach println
     //extractSuddenConnection(mecab) foreach println
-    extractNounPhrase(mecab) foreach println
+    // extractNounPhrase(mecab) foreach println
+    extractConcatenationOfNouns(mecab) foreach println
   }
 
   def mecabNodeListMapper(nodeLst: List[Node]): List[Map[String, String]] = {
@@ -72,6 +73,32 @@ object Main {
     mecab.sliding(3) collect {
       case List(a, and, b) if and("surface") == "の" && a("pos") == "名詞" && b("pos") == "名詞" => a("surface") + and("surface") + b("surface")
     } toList
+  }
+
+  def extractConcatenationOfNouns(mecab: List[Map[String, String]]): List[String] = {
+    def extractRecursive(mecab: List[Map[String, String]], acm: List[String]): List[String] = {
+      val head = mecab.headOption match {
+        case Some(h) => h
+        case None => return acm
+      }
+
+      head match {
+        case h if h("pos") == "名詞" => {
+          val (satisfy, tail) = mecab.span(m => m("pos") == "名詞")
+          if (satisfy.size > 1) {
+            val result = satisfy.map(s => s("surface")).toList.mkString
+            extractRecursive(tail, result :: acm)
+          } else {
+            extractRecursive(tail, acm)
+          }
+        }
+        case _ => {
+          val (dust, tail) = mecab.span(m => m("pos") != "名詞")
+          extractRecursive(tail, acm)
+        }
+      }
+    }
+    extractRecursive(mecab, Nil)
   }
 
 }
