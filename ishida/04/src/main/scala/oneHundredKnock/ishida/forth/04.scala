@@ -41,7 +41,8 @@ object Main {
     //extractVerbBase(mecab) foreach println
     //extractSuddenConnection(mecab) foreach println
     // extractNounPhrase(mecab) foreach println
-    extractConcatenationOfNouns(mecab) foreach println
+    // extractConcatenationOfNouns(mecab) foreach println
+    sortWordsByTF(mecab) foreach println
   }
 
   def mecabNodeListMapper(nodeLst: List[Node]): List[Map[String, String]] = {
@@ -99,6 +100,13 @@ object Main {
       }
     }
     extractRecursive(mecab, Nil)
+  }
+
+  def sortWordsByTF(mecab: List[Map[String, String]]): Seq[(String, Int)] = {
+    def wordWithTF(mecab: List[Map[String, String]]): Map[String, Int] = {
+      mecab.map(m => m("surface")).groupBy(identity).mapValues(v => v.size)
+    }
+    wordWithTF(mecab).toSeq.sortWith(_._2 > _._2)
   }
 
 }
