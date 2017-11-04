@@ -7,6 +7,8 @@ import scala.util.{Try, Success, Failure}
 import org.chasen.mecab.Tagger;
 import org.chasen.mecab.Node;
 
+import com.quantifind.charts.Highcharts._
+
 object Main {
 
   Try { System.loadLibrary("MeCab") } match {
@@ -44,7 +46,8 @@ object Main {
     // extractNounPhrase(mecab) foreach println
     // extractConcatenationOfNouns(mecab) foreach println
     // sortWordsByTF(mecab) foreach println
-    drawHistGram(sortWordsByTF(mecab))
+    // drawStickGraph(sortWordsByTF(mecab))
+    //drawHistGram(sortWordsByTF(mecab))
   }
 
   def mecabNodeListMapper(nodeLst: List[Node]): List[Map[String, String]] = {
@@ -111,13 +114,20 @@ object Main {
     wordWithTF(mecab).toSeq.sortWith(_._2 > _._2)
   }
 
-  def drawHistGram(wordTFMap: Seq[(String, Int)]) = {
+  def drawStickGraph(wordTFMap: Seq[(String, Int)]) = {
     val top10 = wordTFMap.take(10)
     val maxVal = top10.head._2
 
     top10.foreach { wtf =>
       println("%15s:".format(wtf._1) + "".padTo((wtf._2 / maxVal.toDouble * 100).toInt, '*'))
     }
+  }
+
+  def drawHistGram(wordTFMap: Seq[(String, Int)]) = {
+    val freqWordSizeMap = wordTFMap.groupBy(w => identity(w._2)).mapValues(_.size)
+    val x = wordTFMap.map{m => m._2}.toSeq.distinct toList
+    val y = x.map{v => freqWordSizeMap(v)}
+    column(x, y)
   }
 
 }
