@@ -37,7 +37,8 @@ object Main {
     val tagger = new Tagger("")
     val node = tagger.parseToNode(text)
 
-    mecabNodeListMapper(node.toList) foreach println
+    val mecab = mecabNodeListMapper(node.toList)
+    extractVerbBase(mecab) foreach println
   }
 
   def mecabNodeListMapper(nodeLst: List[Node]): List[Map[String, String]] = {
@@ -55,6 +56,10 @@ object Main {
         case pattern(pos, pos1, _, _, _, _, base) => Map("surface" -> surface, "base" -> base, "pos" -> pos, "pos1" -> pos1)
       }
     } toList
+  }
+
+  def extractVerbBase(mecab: List[Map[String, String]]): List[String] = {
+    mecab collect { case morpheme if morpheme("pos") == "動詞" => morpheme("base") } toList
   }
 
 }
