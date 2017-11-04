@@ -48,6 +48,7 @@ object Main {
     // sortWordsByTF(mecab) foreach println
     // drawStickGraph(sortWordsByTF(mecab))
     //drawHistGram(sortWordsByTF(mecab))
+    drawLogLogGraph(sortWordsByTF(mecab))
   }
 
   def mecabNodeListMapper(nodeLst: List[Node]): List[Map[String, String]] = {
@@ -128,6 +129,14 @@ object Main {
     val x = wordTFMap.map{m => m._2}.toSeq.distinct toList
     val y = x.map{v => freqWordSizeMap(v)}
     column(x, y)
+  }
+
+  def drawLogLogGraph(wordTFMap: Seq[(String, Int)]) = {
+    val freqWordSizeMap = wordTFMap.groupBy(w => identity(w._2)).mapValues(_.size)
+    val x = wordTFMap.map{m => m._2 }.toSeq.distinct toList
+    val y = x.map{v => Math.log(freqWordSizeMap(v)) }
+    val rank = x.zipWithIndex.map{case (v, i) => Math.log(i+1.0)}.toList
+    column(rank, y)
   }
 
 }
