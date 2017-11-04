@@ -1,6 +1,7 @@
 package oneHundredKnock.ishida.forth
 
 import scala.io.Source
+import scala.math._
 import scala.util.{Try, Success, Failure}
 
 import org.chasen.mecab.Tagger;
@@ -42,7 +43,8 @@ object Main {
     //extractSuddenConnection(mecab) foreach println
     // extractNounPhrase(mecab) foreach println
     // extractConcatenationOfNouns(mecab) foreach println
-    sortWordsByTF(mecab) foreach println
+    // sortWordsByTF(mecab) foreach println
+    drawHistGram(sortWordsByTF(mecab))
   }
 
   def mecabNodeListMapper(nodeLst: List[Node]): List[Map[String, String]] = {
@@ -107,6 +109,15 @@ object Main {
       mecab.map(m => m("surface")).groupBy(identity).mapValues(v => v.size)
     }
     wordWithTF(mecab).toSeq.sortWith(_._2 > _._2)
+  }
+
+  def drawHistGram(wordTFMap: Seq[(String, Int)]) = {
+    val top10 = wordTFMap.take(10)
+    val maxVal = top10.head._2
+
+    top10.foreach { wtf =>
+      println("%15s:".format(wtf._1) + "".padTo((wtf._2 / maxVal.toDouble * 100).toInt, '*'))
+    }
   }
 
 }
