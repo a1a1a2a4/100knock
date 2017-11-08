@@ -6,3 +6,4 @@ from pprint import pprint
 
 england = function.summarize20()
 basic_infoOb = function.summarize21_27(england)
+# remove to (*, #, :, ;)
