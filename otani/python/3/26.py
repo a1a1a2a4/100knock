@@ -13,12 +13,12 @@ with gzip.open('jawiki-country.json.gz', 'rt', 'utf-8') as f:
 basic_info = repattern.findall(england)
 basic_info_line = basic_info[0][0].split('\n|')
 basic_infoOb = {}
+emphasisList = {}
 for line in basic_info_line:
     line = line.split(' = ')
-    line[1] = line[1].replace("'''''", "")
-    line[1] = line[1].replace("'''", "")
-    line[1] = line[1].replace("''", "")
     basic_infoOb[line[0]] = line[1]
-    # print(line[1])
+    emphasisList[line[0]] = (re.search(r'(\'{2,5})(.*?)(\1)', basic_infoOb[line[0]]))
+    if(emphasisList[line[0]]):
+        basic_infoOb[line[0]] = basic_infoOb[line[0]].replace(emphasisList[line[0]].group(), emphasisList[line[0]].group().replace("'", ""))
 
 pprint(basic_infoOb)
