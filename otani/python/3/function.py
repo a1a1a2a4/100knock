@@ -28,3 +28,12 @@ def summarize21_27(england):
             for internal in internalList[line[0]]:
                 basic_infoOb[line[0]] = basic_infoOb[line[0]].replace(internal, internal.replace('[', '').replace(']', ''))
     return basic_infoOb
+def summarize28(basic_infoOb):
+    deletions = {}
+    for key, value in basic_infoOb.items():
+        deletions[key] = re.findall(r'(\{\{[^\{\}]+\}\})', value)
+        if(deletions[key]):
+            for k, deletion in enumerate(deletions[key]):
+                deletions[key][k] = deletion.replace(deletion, deletion.replace('{{', '').replace('}}', ''))
+                basic_infoOb[key] = basic_infoOb[key].replace(deletion, deletions[key][k])
+    return basic_infoOb
