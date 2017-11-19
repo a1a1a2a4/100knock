@@ -10,6 +10,15 @@ object Main {
     parsed(8).foreach{chunk => println(chunk.dst + " " + chunk.texts)}
   }
 
+  def problem42(parsed: List[List[Chunk]]) = {
+    parsed foreach { sentense =>
+      sentense filter { _.srcs.size != 0 } foreach { chunk =>
+        val srcsChunkTexts = chunk.srcs.map{ idx => sentense(idx).noSymbolTexts }.mkString("\t")
+        println(chunk.noSymbolTexts + " " + srcsChunkTexts)
+      }
+    }
+  }
+
   def main(args: Array[String]): Unit = {
 
     val input = Source.fromFile("neko.txt.cabocha").mkString
@@ -20,6 +29,7 @@ object Main {
     }
 
     //problem40(parsed)
-    problem41(parsed)
+    //problem41(parsed)
+    problem42(parsed)
   }
 }
