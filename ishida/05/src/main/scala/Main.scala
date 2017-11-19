@@ -11,12 +11,8 @@ object Main {
   }
 
   def problem42(parsed: List[List[Chunk]]) = {
-    parsed foreach { sentense =>
-      sentense filter { _.srcs.size != 0 } foreach { chunk =>
-        val srcsChunkTexts = chunk.srcs.map{ idx => sentense(idx).noSymbolTexts }.mkString("\t")
-        println(chunk.noSymbolTexts + " " + srcsChunkTexts)
-      }
-    }
+    for (sentense <- parsed: List[List[Chunk]]; chunk <- sentense: List[Chunk]; if chunk.dst != -1)
+      println(chunk.noSymbolTexts + "\t" + sentense(chunk.dst).noSymbolTexts)
   }
 
   def main(args: Array[String]): Unit = {
