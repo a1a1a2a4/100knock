@@ -11,3 +11,20 @@ for i in range(len(morpheme_dic)):
     if(morpheme_li[i][0]):
         morpheme_dic[i] = {'surface' : morpheme_li[i][0], 'base' : morpheme_li[i][1], 'pos' : morpheme_li[i][2], 'pos1' : morpheme_li[i][3]}
 # pprint(morpheme_dic)
+
+
+# Test Code
+# c = 0
+# for i in range(len(l)):
+#     c = c + morpheme_li[i][0].count('。')
+# morpheme_dic = [[{} for j in range(100)] for i in range(c)]
+# i = 0
+# j = 0
+# k = 0
+# while(i <= len(l)):
+#     if(morpheme_li[i][0]):
+#         morpheme_dic[k][j] = {'surface' : morpheme_li[i][0], 'base' : morpheme_li[i][1], 'pos' : morpheme_li[i][2], 'pos1' : morpheme_li[i][3]}
+#     j = j + 1
+#     if(morpheme_li[i][0] == '。'):
+#         k = k + 1
+#     i = i + 1
