@@ -1,28 +1,38 @@
 import scala.util.parsing.combinator._
 
-case class Chunk(morphs: List[Morph], dst: Int, srcs: List[Int])
-
-case class Morph(surface: String, base: String, pos: String, pos1: String)
-
 object CabochaParser extends RegexParsers {
 
   override def skipWhitespace: Boolean = false
 
   def cabochaFormatLattice = repsep(sentense, EOS)
 
-  def sentense = chunk.*
-
-  def chunk = chunkInfo ~ EOL ~ (morph1 | morph2).* ^^ {
-    case info ~ _ ~ morphs => {
-      println(info)
-      Chunk(morphs, 0, Nil)
+  def sentense = chunk.* ^^ { chunks =>
+    val idxSrcsMap: Map[Int, List[(Int, Chunk)]] = chunks.groupBy(_._2.dst)
+    chunks map { case (idx, chunk) =>
+      if (idxSrcsMap.contains(idx)) {
+        val newSrcs = idxSrcsMap(idx).map{ _._1 }
+        chunk.copy(srcs = newSrcs)
+      } else chunk
     }
   }
 
-  def chunkInfo = "*" ~ space ~ repsep(japanese_text, space)
+  def chunk: Parser[(Int, Chunk)] = chunkInfo ~ EOL ~ (morph1 | morph2).* ^^ {
+    case idxDst ~ _ ~ morphs => {
+      val (idx, dst) = idxDst
+      (idx, Chunk(morphs, dst, Nil))
+    }
+  }
 
-  def morph1 = surface ~ space ~ pos ~ comma ~ pos1 ~ comma ~ cjtvf ~ comma ~ usflt ~ comma ~ base ~ comma ~ reading ~ comma ~ pronunce ~ comma ~ japanese_text ~ comma ~ japanese_text ~ EOL ^^ {
-    case (surface ~ _ ~ pos ~ _ ~ pos1 ~ _ ~ _ ~ _ ~ _ ~ _ ~ base ~ _ ~ _ ~ _ ~ _ ~ _ ~ _ ~ _ ~ _ ~ _) => Morph(surface, base, pos, pos1)
+  private val dstPattern = """(.+)(D|O)""".r
+  def chunkInfo = "*" ~ space ~ repsep(japanese_text, space) ^^ {
+    case _ ~ _ ~ infos => {
+      val dst = infos(1) match { case dstPattern(dst, _) => dst.toInt }
+      (infos(0).toInt, dst)
+    }
+  }
+
+  def morph1 = surface ~ space ~ pos ~ comma ~ pos1 ~ comma ~ pos2 ~ comma ~ pos3 ~ comma ~ cjtvf ~ comma ~ usflt ~ comma ~ base ~ comma ~ reading ~ comma ~ pronunce ~ EOL ^^ {
+    case (surface ~ _ ~ pos ~ _ ~ pos1 ~ _ ~ _ ~ _ ~ _ ~ _ ~ _ ~ _ ~ _ ~ base ~ _ ~ _ ~ _ ~ _ ~ _ ~ _) => Morph(surface, base, pos, pos1)
   }
 
   def morph2 = surface ~ space ~ pos ~ comma ~ pos1 ~ comma ~ cjtvf ~ comma ~ usflt ~ comma ~ base ~ comma ~ reading ~ comma ~ pronunce ~ EOL ^^ {
@@ -34,6 +44,10 @@ object CabochaParser extends RegexParsers {
   def pos = japanese_text
 
   def pos1 = japanese_text
+
+  def pos2 = japanese_text
+
+  def pos3 = japanese_text
 
   def cjtvf = japanese_text
 
