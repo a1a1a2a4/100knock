@@ -15,6 +15,14 @@ object Main {
       println(chunk.noSymbolTexts + "\t" + sentense(chunk.dst).noSymbolTexts)
   }
 
+  def problem43(parsed: List[List[Chunk]]) = for (
+    sentense <-parsed;
+    chunk <- sentense;
+    if chunk.containsNoun && chunk.dst != -1 && sentense(chunk.dst).containsVerb
+  ) {
+    println(chunk.noSymbolTexts + "\t" + sentense(chunk.dst).noSymbolTexts)
+  }
+
   def main(args: Array[String]): Unit = {
 
     val input = Source.fromFile("neko.txt.cabocha").mkString
@@ -24,8 +32,9 @@ object Main {
       case Left(_) => List(Nil)
     }
 
-    //problem40(parsed)
-    //problem41(parsed)
-    problem42(parsed)
+//    problem40(parsed)
+//    problem41(parsed)
+//    problem42(parsed)
+    problem43(parsed)
   }
 }
